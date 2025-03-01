@@ -27,6 +27,10 @@ struct command_line *parse_input()
 	fflush(stdout);
 	fgets(input, INPUT_LENGTH, stdin);
 
+	// Ignore comments
+    if(input[0] == '#'){
+		return curr_command;
+	}
 	// Tokenize the input
 	char *token = strtok(input, " \n");
 	while(token){
