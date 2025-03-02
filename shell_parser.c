@@ -38,13 +38,19 @@ struct command_line *parse_input()
 			curr_command->input_file = strdup(strtok(NULL," \n"));
 		} else if(!strcmp(token,">")){
 			curr_command->output_file = strdup(strtok(NULL," \n"));
-		} else if(!strcmp(token,"&")){
+		} else if(!strcmp(token,"&") && *token+1 == 0){
 			curr_command->is_bg = true;
 		} else{
 			curr_command->argv[curr_command->argc++] = strdup(token);
 		}
 		token=strtok(NULL," \n");
 	}
+
+	for(int i = 0; i < curr_command->argc+1; i++){
+		printf("argv %d is %s\n", i, curr_command->argv[i]);
+		fflush(stdout);
+	}
+
 	return curr_command;
 }
 
