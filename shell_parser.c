@@ -2,9 +2,12 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #define INPUT_LENGTH 	2048
 #define MAX_ARGS		512
+
+char *HOME_PATH = "/home";
 
 
 struct command_line
@@ -46,12 +49,32 @@ struct command_line *parse_input()
 		token=strtok(NULL," \n");
 	}
 
-	for(int i = 0; i < curr_command->argc+1; i++){
-		printf("argv %d is %s\n", i, curr_command->argv[i]);
-		fflush(stdout);
-	}
-
 	return curr_command;
+}
+
+void change_dir(struct command_line *curr_command){
+	char *path = (char *) calloc(2048, sizeof(char *));
+	if(curr_command->argc == 1){
+		strcpy(path, HOME_PATH);
+	} else {
+		strcpy(path, curr_command->argv[1]);
+	}
+	chdir(path);
+	getcwd(path, 2048);
+	setenv("PWD", path, 1);
+	free(path);
+}
+
+void execute_command(struct command_line *curr_command){
+	char *command_name = (char *) calloc(32, sizeof(char *));
+	strcpy(command_name, curr_command->argv[0]);
+	// Execute a built-in command or default to another
+	// Change directory
+	if(!strcmp(command_name, "cd")){
+		change_dir(curr_command);
+	}
+	// Free space
+	free(command_name);
 }
 
 int main()
@@ -62,6 +85,9 @@ int main()
 	{
 		curr_command = parse_input();
 
+		if(curr_command->argc > 0){
+			execute_command(curr_command);
+		}
 	}
 	return EXIT_SUCCESS;
 }
